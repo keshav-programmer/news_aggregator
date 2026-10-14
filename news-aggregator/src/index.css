@@ -34,3 +34,116 @@ button {
   background: #f97316;
   color: #fff;
 }
+
+
+/* ==================================
+   PRESSLY: LIGHT THEME
+   ================================== */
+
+.light-theme {
+  background-color: #f8fafc !important;
+  color: #111827 !important;
+  color-scheme: light;
+  transition: background-color 0.25s, color 0.25s;
+}
+
+.dark-theme {
+  color-scheme: dark;
+  transition: background-color 0.25s, color 0.25s;
+}
+
+/* Main header and navigation */
+.light-theme header {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  border-color: #e2e8f0 !important;
+}
+
+.light-theme header nav {
+  border-color: #e2e8f0 !important;
+}
+
+/* Main page background */
+.light-theme [class~="bg-[#090b10]"] {
+  background-color: #f8fafc !important;
+}
+
+/* News cards */
+.light-theme [class~="bg-[#10131b]"] {
+  background-color: #ffffff !important;
+}
+
+.light-theme article {
+  border-color: #e2e8f0 !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.035);
+}
+
+.light-theme article:hover {
+  border-color: #fdba74 !important;
+}
+
+/* Search fields, secondary buttons and surfaces */
+.light-theme [class~="bg-white/[0.04]"],
+.light-theme [class~="bg-white/[0.05]"],
+.light-theme [class~="bg-white/[0.06]"],
+.light-theme [class~="bg-white/5"] {
+  background-color: #f1f5f9 !important;
+}
+
+/* Text colors */
+.light-theme [class~="text-gray-100"],
+.light-theme [class~="text-gray-200"],
+.light-theme [class~="text-gray-300"] {
+  color: #1e293b !important;
+}
+
+.light-theme [class~="text-gray-400"] {
+  color: #475569 !important;
+}
+
+.light-theme [class~="text-gray-500"],
+.light-theme [class~="text-gray-600"] {
+  color: #64748b !important;
+}
+
+/* Borders and separators */
+.light-theme [class~="border-white/10"],
+.light-theme [class~="border-white/20"],
+.light-theme [class~="border-white/[0.08]"],
+.light-theme [class~="border-white/[0.07]"],
+.light-theme [class~="border-white/5"] {
+  border-color: #e2e8f0 !important;
+}
+
+/* Keep orange buttons readable */
+.light-theme [class~="bg-orange-500"] {
+  color: #ffffff;
+}
+
+/* Make form controls fit the selected theme */
+.light-theme input {
+  color: #0f172a;
+}
+
+.light-theme input::placeholder {
+  color: #64748b;
+}
+
+.light-theme input:focus {
+  outline-color: #f97316;
+}
+
+/* Softer light-theme empty state */
+.light-theme [class~="border-dashed"] {
+  border-color: #cbd5e1 !important;
+}
+
+/* Smooth theme switching */
+.app-shell,
+.app-shell header,
+.app-shell article {
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
+}
+
