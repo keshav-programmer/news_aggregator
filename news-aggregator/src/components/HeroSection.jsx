@@ -50,7 +50,7 @@ function HeroSection({ articles, setCategory, setShowBookmarks }) {
         <div className="mt-8 flex items-center gap-6 border-t border-white/10 pt-6">
           <div>
             <p className="text-2xl font-bold">{articles.length}</p>
-            <p className="mt-1 text-xs text-gray-500">Demo stories</p>
+            <p className="mt-1 text-xs text-gray-500"> stories loaded</p>
           </div>
 
           <div className="h-9 w-px bg-white/10" />
@@ -71,12 +71,16 @@ function HeroSection({ articles, setCategory, setShowBookmarks }) {
         </div>
       </div>
 
-      <div className="relative min-h-[280px] overflow-hidden rounded-2xl border border-white/10 sm:min-h-[350px]">
-        <img
-          src={articles[0].image}
-          alt="India's iconic Taj Mahal"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
+      
+<div className="relative min-h-[280px] overflow-hidden rounded-2xl border border-white/10 sm:min-h-[350px]">
+  {articles.length > 0 && (
+    <img
+      src={articles[0].image || ""}
+      alt={articles[0].title || "Featured news"}
+      className="absolute inset-0 h-full w-full object-cover"
+    />
+  )}
+
 
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
 

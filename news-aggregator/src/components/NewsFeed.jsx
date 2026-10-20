@@ -41,7 +41,7 @@ function NewsFeed({
 
         <div className="flex items-center gap-2 text-xs text-gray-500">
           <Clock3 size={15} />
-          Demo content
+          Actuall content
         </div>
       </div>
 

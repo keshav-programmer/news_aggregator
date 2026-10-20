@@ -5,6 +5,7 @@ import {
   Menu,
   Newspaper,
   BookmarkCheck,
+  X,
 } from 'lucide-react'
 
 import ThemeToggle from './ThemeToggle'
@@ -16,6 +17,7 @@ function Navbar({
   setQuery,
   category,
   chooseCategory,
+  setCategory,
   bookmarks,
   showBookmarks,
   setShowBookmarks,
@@ -69,8 +71,8 @@ function Navbar({
         <div className="ml-auto flex items-center gap-2">
           <button
             onClick={() => {
-              setShowBookmarks(!showBookmarks)
-              chooseCategory('All News')
+              setShowBookmarks((previous) => !previous)
+              setCategory('All News')
               setMobileMenu(false)
             }}
             className={`relative flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm transition ${

@@ -14,7 +14,7 @@ function Footer() {
         </div>
 
         <p className="text-xs leading-5 text-gray-600">
-          Learning project · Demo content, not live headlines
+          Learning project · live headlines
         </p>
       </div>
     </footer>

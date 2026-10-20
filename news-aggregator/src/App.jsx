@@ -13,7 +13,6 @@ import {
   Zap,
 } from "lucide-react";
 import Navbar from "./components/Navbar";
-import articles from './data/articles'
 
 
 
@@ -34,19 +33,79 @@ function App() {
     () => localStorage.getItem("pressly-theme") || "dark",
   );
 
-  useEffect(() => {
-    localStorage.setItem("pressly-theme", theme);
-  }, [theme]);
-  const [category, setCategory] = useState("All News");
+
+   const [category, setCategory] = useState("All News");
   const [query, setQuery] = useState("");
   const [bookmarks, setBookmarks] = useState([]);
   const [showBookmarks, setShowBookmarks] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
 
+  // New news-related state
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    localStorage.setItem("pressly-theme", theme);
+  }, [theme]);
+
+  
+useEffect(() => {
+  async function fetchNews() {
+    setLoading(true);
+    setError("");
+
+    try {
+      const categoryMap = {
+        "All News": "general",
+        India: "general",
+        World: "general",
+        Technology: "technology",
+        Business: "business",
+        Science: "science",
+        Sports: "sports",
+        Entertainment: "entertainment",
+      };
+
+      const apiCategory = categoryMap[category] || "general";
+
+      const response = await fetch(
+        `http://localhost:5000/api/news?category=${apiCategory}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch news");
+      }
+
+      const data = await response.json();
+
+      const formattedArticles = data.articles.map((article) => ({
+        ...article,
+        category:
+          apiCategory === "general"
+            ? "World"
+            : categoryMap[category] === apiCategory
+              ? category
+              : "World",
+      }));
+
+      setArticles(formattedArticles);
+    } catch (err) {
+      console.error("News fetching error:", err);
+      setError("Unable to load news. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  fetchNews();
+}, [category]);
+
+
   const visibleArticles = useMemo(() => {
     return articles.filter((article) => {
-      const matchesCategory =
-        category === "All News" || article.category === category;
+     const matchesCategory =
+  category === "All News" || article.category === category;
 
       const text =
         `${article.title} ${article.description} ${article.source} ${article.category}`.toLowerCase();
@@ -56,7 +115,7 @@ function App() {
 
       return matchesCategory && matchesSearch && matchesBookmarks;
     });
-  }, [category, query, bookmarks, showBookmarks]);
+  }, [articles, category, query, bookmarks, showBookmarks]);
 
   function toggleBookmark(id) {
     setBookmarks((previous) =>
@@ -92,6 +151,7 @@ function App() {
         setQuery={setQuery}
         category={category}
         chooseCategory={chooseCategory}
+        setCategory={setCategory}
         bookmarks={bookmarks}
         showBookmarks={showBookmarks}
         setShowBookmarks={setShowBookmarks}
