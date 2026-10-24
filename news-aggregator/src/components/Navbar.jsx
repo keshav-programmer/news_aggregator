@@ -17,31 +17,20 @@ function Navbar({
   setQuery,
   category,
   chooseCategory,
-  setCategory,
-  bookmarks,
+  bookmarkCount,
   showBookmarks,
   setShowBookmarks,
   mobileMenu,
   setMobileMenu,
 }) {
-  const categories = [
-    'All News',
-    'India',
-    'World',
-    'Technology',
-    'Business',
-    'Science',
-    'Sports',
-    'Entertainment',
-  ]
-
   return (
     <header className="sticky top-0 z-30 border-b border-white/10 bg-[#090b10]/95 backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center gap-4 px-4 py-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <button
+          type="button"
           onClick={() => {
-            chooseCategory('All News')
+            chooseCategory('all')
             setQuery('')
           }}
           className="flex shrink-0 items-center gap-2"
@@ -70,9 +59,10 @@ function Navbar({
         {/* Right-side actions */}
         <div className="ml-auto flex items-center gap-2">
           <button
+            type="button"
+            aria-pressed={showBookmarks}
             onClick={() => {
               setShowBookmarks((previous) => !previous)
-              setCategory('All News')
               setMobileMenu(false)
             }}
             className={`relative flex items-center gap-2 rounded-xl border px-3 py-2.5 text-sm transition ${
@@ -89,15 +79,16 @@ function Navbar({
 
             <span className="hidden sm:inline">Saved</span>
 
-            {bookmarks.length > 0 && (
+            {bookmarkCount > 0 && (
               <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1 text-xs text-white">
-                {bookmarks.length}
+                {bookmarkCount}
               </span>
             )}
           </button>
 
           {/* Mobile menu button */}
           <button
+            type="button"
             onClick={() => setMobileMenu(!mobileMenu)}
             className="rounded-xl border border-white/10 p-2.5 md:hidden"
             aria-label="Toggle menu"
@@ -111,13 +102,11 @@ function Navbar({
 
           {/* Profile */}
           <button
-            onClick={() =>
-              alert(
-                'Profile and authentication are coming in a later milestone!'
-              )
-            }
-            className="hidden h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm font-bold text-orange-300 sm:flex"
-            aria-label="Profile"
+            type="button"
+            disabled
+            title="Profiles are coming soon"
+            className="hidden h-10 w-10 cursor-not-allowed items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm font-bold text-orange-300 opacity-60 sm:flex"
+            aria-label="Profile (coming soon)"
           >
             U
           </button>

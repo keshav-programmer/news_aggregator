@@ -1,140 +1,62 @@
-import { useEffect, useMemo, useState } from "react";
-import ThemeToggle from "./components/ThemeToggle";
-import BreakingTicker from "./components/BreakingTicker";
-import HeroSection from "./components/HeroSection";
-import NewsFeed from "./components/NewsFeed";
+import { useEffect, useMemo, useState } from 'react'
+import { Zap } from 'lucide-react'
+import Navbar from './components/Navbar'
+import BreakingTicker from './components/BreakingTicker'
+import HeroSection from './components/HeroSection'
+import NewsFeed from './components/NewsFeed'
 import Footer from './components/Footer'
-import {
-  Bookmark,
-  Clock3,
-  ArrowUpRight,
-  TrendingUp,
-  Globe2,
-  Zap,
-} from "lucide-react";
-import Navbar from "./components/Navbar";
+import { labelFor } from './constants/categories'
+import { useNews } from './hooks/useNews'
+import { useBookmarks } from './hooks/useBookmarks'
+import { useDebouncedValue } from './hooks/useDebouncedValue'
+import { readStorage, writeStorage } from './utils/storage'
 
-
-
-const categories = [
-  "All News",
-  "India",
-  "World",
-  "Technology",
-  "Business",
-  "Science",
-  "Sports",
-  "Entertainment",
-];
-
+const THEME_KEY = 'pressly-theme'
 
 function App() {
-  const [theme, setTheme] = useState(
-    () => localStorage.getItem("pressly-theme") || "dark",
-  );
+  const [theme, setTheme] = useState(() => (readStorage(THEME_KEY) === 'light' ? 'light' : 'dark'))
+  const [category, setCategory] = useState('all')
+  const [query, setQuery] = useState('')
+  const [showBookmarks, setShowBookmarks] = useState(false)
+  const [mobileMenu, setMobileMenu] = useState(false)
 
+  const { bookmarks, bookmarkIds, toggleBookmark } = useBookmarks()
 
-   const [category, setCategory] = useState("All News");
-  const [query, setQuery] = useState("");
-  const [bookmarks, setBookmarks] = useState([]);
-  const [showBookmarks, setShowBookmarks] = useState(false);
-  const [mobileMenu, setMobileMenu] = useState(false);
-
-  // New news-related state
-  const [articles, setArticles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  // Typing updates `query` instantly; the API is only called once typing pauses.
+  const trimmedQuery = query.trim()
+  const debouncedQuery = useDebouncedValue(trimmedQuery, 400)
+  const news = useNews(category, debouncedQuery)
 
   useEffect(() => {
-    localStorage.setItem("pressly-theme", theme);
-  }, [theme]);
+    writeStorage(THEME_KEY, theme)
+  }, [theme])
 
-  
-useEffect(() => {
-  async function fetchNews() {
-    setLoading(true);
-    setError("");
+  // Saved stories are searched locally, since they're already on this device.
+  const savedMatches = useMemo(() => {
+    const needle = trimmedQuery.toLowerCase()
+    if (!needle) return bookmarks
+    return bookmarks.filter((article) =>
+      `${article.title} ${article.description} ${article.source}`.toLowerCase().includes(needle)
+    )
+  }, [bookmarks, trimmedQuery])
 
-    try {
-      const categoryMap = {
-        "All News": "general",
-        India: "general",
-        World: "general",
-        Technology: "technology",
-        Business: "business",
-        Science: "science",
-        Sports: "sports",
-        Entertainment: "entertainment",
-      };
-
-      const apiCategory = categoryMap[category] || "general";
-
-      const response = await fetch(
-        `http://localhost:5000/api/news?category=${apiCategory}`
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch news");
-      }
-
-      const data = await response.json();
-
-      const formattedArticles = data.articles.map((article) => ({
-        ...article,
-        category:
-          apiCategory === "general"
-            ? "World"
-            : categoryMap[category] === apiCategory
-              ? category
-              : "World",
-      }));
-
-      setArticles(formattedArticles);
-    } catch (err) {
-      console.error("News fetching error:", err);
-      setError("Unable to load news. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+  function chooseCategory(key) {
+    setCategory(key)
+    setShowBookmarks(false)
+    setMobileMenu(false)
   }
 
-  fetchNews();
-}, [category]);
-
-
-  const visibleArticles = useMemo(() => {
-    return articles.filter((article) => {
-     const matchesCategory =
-  category === "All News" || article.category === category;
-
-      const text =
-        `${article.title} ${article.description} ${article.source} ${article.category}`.toLowerCase();
-
-      const matchesSearch = text.includes(query.toLowerCase());
-      const matchesBookmarks = !showBookmarks || bookmarks.includes(article.id);
-
-      return matchesCategory && matchesSearch && matchesBookmarks;
-    });
-  }, [articles, category, query, bookmarks, showBookmarks]);
-
-  function toggleBookmark(id) {
-    setBookmarks((previous) =>
-      previous.includes(id)
-        ? previous.filter((item) => item !== id)
-        : [...previous, id],
-    );
+  function resetFilters() {
+    setQuery('')
+    chooseCategory('all')
   }
 
-  function chooseCategory(item) {
-    setCategory(item);
-    setShowBookmarks(false);
-    setMobileMenu(false);
-  }
+  const isAllNews = category === 'all'
 
   return (
     <div
       className={`app-shell min-h-screen ${
-        theme === "light" ? "light-theme" : "dark-theme"
+        theme === 'light' ? 'light-theme' : 'dark-theme'
       } bg-[#090b10] text-gray-100`}
     >
       {/* Top announcement bar */}
@@ -143,7 +65,6 @@ useEffect(() => {
         <span>YOUR WORLD. YOUR NEWS. ALL IN ONE PLACE.</span>
       </div>
 
-      {/* Navbar */}
       <Navbar
         theme={theme}
         setTheme={setTheme}
@@ -151,8 +72,7 @@ useEffect(() => {
         setQuery={setQuery}
         category={category}
         chooseCategory={chooseCategory}
-        setCategory={setCategory}
-        bookmarks={bookmarks}
+        bookmarkCount={bookmarks.length}
         showBookmarks={showBookmarks}
         setShowBookmarks={setShowBookmarks}
         mobileMenu={mobileMenu}
@@ -160,36 +80,38 @@ useEffect(() => {
       />
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        {/* Breaking news ticker */}
-        <BreakingTicker />
+        <BreakingTicker headlines={news.articles.slice(0, 5)} />
 
-        {/* Hero */}
-        {!showBookmarks && category === "All News" && !query && (
+        {!showBookmarks && isAllNews && !query && (
           <HeroSection
-            articles={articles}
-            setCategory={setCategory}
-            setShowBookmarks={setShowBookmarks}
+            articles={news.articles}
+            loading={news.loading}
+            onSelectWorld={() => chooseCategory('world')}
           />
         )}
 
-        {/* Feed heading */}
         <NewsFeed
-          articles={visibleArticles}
-          bookmarks={bookmarks}
+          articles={showBookmarks ? savedMatches : news.articles}
+          loading={!showBookmarks && news.loading}
+          error={showBookmarks ? '' : news.error}
+          onRetry={news.retry}
+          hasMore={news.hasMore}
+          loadingMore={news.loadingMore}
+          moreError={news.moreError}
+          onLoadMore={news.loadMore}
+          bookmarkIds={bookmarkIds}
           toggleBookmark={toggleBookmark}
           showBookmarks={showBookmarks}
-          category={category}
-          query={query}
-          setQuery={setQuery}
-          setCategory={setCategory}
-          setShowBookmarks={setShowBookmarks}
+          categoryLabel={labelFor(category)}
+          isAllNews={isAllNews}
+          query={trimmedQuery}
+          onReset={resetFilters}
         />
 
-        {/* Footer */}
         <Footer />
       </main>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

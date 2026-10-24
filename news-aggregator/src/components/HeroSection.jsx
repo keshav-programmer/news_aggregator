@@ -1,10 +1,14 @@
+import { useState } from 'react'
+import { ArrowUpRight, Globe2 } from 'lucide-react'
+import { CATEGORIES } from '../constants/categories'
 
-import {
-  ArrowUpRight,
-  Globe2,
-} from 'lucide-react'
+function HeroSection({ articles, loading, onSelectWorld }) {
+  const [failedImage, setFailedImage] = useState('')
 
-function HeroSection({ articles, setCategory, setShowBookmarks }) {
+  // Spotlight the first story that actually has a picture.
+  const spotlight = articles.find((article) => article.image)
+  const showImage = spotlight && spotlight.image !== failedImage
+
   return (
     <section className="mb-12 grid gap-8 lg:grid-cols-[1.5fr_1fr] lg:items-center">
       <div className="py-2">
@@ -20,16 +24,15 @@ function HeroSection({ articles, setCategory, setShowBookmarks }) {
         </h1>
 
         <p className="mt-5 max-w-xl text-base leading-7 text-gray-400 sm:text-lg">
-          The stories that matter, from India to every corner of the
-          world. Less noise, more perspective.
+          The stories that matter, from India to every corner of the world. Less noise, more
+          perspective.
         </p>
 
         <div className="mt-7 flex flex-wrap gap-3">
           <button
+            type="button"
             onClick={() =>
-              document.getElementById('news-feed')?.scrollIntoView({
-                behavior: 'smooth',
-              })
+              document.getElementById('news-feed')?.scrollIntoView({ behavior: 'smooth' })
             }
             className="flex items-center gap-2 rounded-xl bg-orange-500 px-5 py-3 text-sm font-bold text-white transition hover:bg-orange-400"
           >
@@ -37,10 +40,8 @@ function HeroSection({ articles, setCategory, setShowBookmarks }) {
           </button>
 
           <button
-            onClick={() => {
-              setCategory('World')
-              setShowBookmarks(false)
-            }}
+            type="button"
+            onClick={onSelectWorld}
             className="rounded-xl border border-white/10 px-5 py-3 text-sm font-semibold text-gray-300 transition hover:bg-white/5"
           >
             World news
@@ -49,14 +50,14 @@ function HeroSection({ articles, setCategory, setShowBookmarks }) {
 
         <div className="mt-8 flex items-center gap-6 border-t border-white/10 pt-6">
           <div>
-            <p className="text-2xl font-bold">{articles.length}</p>
-            <p className="mt-1 text-xs text-gray-500"> stories loaded</p>
+            <p className="text-2xl font-bold">{loading ? '—' : articles.length}</p>
+            <p className="mt-1 text-xs text-gray-500">stories loaded</p>
           </div>
 
           <div className="h-9 w-px bg-white/10" />
 
           <div>
-            <p className="text-2xl font-bold">8</p>
+            <p className="text-2xl font-bold">{CATEGORIES.length}</p>
             <p className="mt-1 text-xs text-gray-500">News sections</p>
           </div>
 
@@ -71,31 +72,46 @@ function HeroSection({ articles, setCategory, setShowBookmarks }) {
         </div>
       </div>
 
-      
-<div className="relative min-h-[280px] overflow-hidden rounded-2xl border border-white/10 sm:min-h-[350px]">
-  {articles.length > 0 && (
-    <img
-      src={articles[0].image || ""}
-      alt={articles[0].title || "Featured news"}
-      className="absolute inset-0 h-full w-full object-cover"
-    />
-  )}
-
+      <div className="relative min-h-[280px] overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-orange-500/20 to-white/[0.04] sm:min-h-[350px]">
+        {showImage && (
+          <img
+            src={spotlight.image}
+            alt=""
+            referrerPolicy="no-referrer"
+            onError={() => setFailedImage(spotlight.image)}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        )}
 
         <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
 
         <div className="absolute inset-x-0 bottom-0 p-6 sm:p-8">
           <span className="rounded-md bg-orange-500 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white">
-            Editor's spotlight
+            Top story
           </span>
 
-          <h2 className="mt-4 max-w-lg text-2xl font-bold leading-tight text-white sm:text-3xl">
-            Stories that help you see the bigger picture.
-          </h2>
-
-          <p className="mt-3 text-sm text-gray-300">
-            India, innovation and a changing world.
-          </p>
+          {spotlight ? (
+            <>
+              <h2 className="mt-4 max-w-lg text-2xl font-bold leading-tight text-white sm:text-3xl">
+                <a
+                  href={spotlight.url}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="line-clamp-3 hover:underline"
+                >
+                  {spotlight.title}
+                </a>
+              </h2>
+              <p className="mt-3 text-sm text-gray-300">{spotlight.source}</p>
+            </>
+          ) : (
+            <>
+              <h2 className="mt-4 max-w-lg text-2xl font-bold leading-tight text-white sm:text-3xl">
+                Stories that help you see the bigger picture.
+              </h2>
+              <p className="mt-3 text-sm text-gray-300">India, innovation and a changing world.</p>
+            </>
+          )}
         </div>
       </div>
     </section>
